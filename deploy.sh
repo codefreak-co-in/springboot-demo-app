@@ -11,7 +11,7 @@ HEALTH_CHECK_PATH="/actuator/health"
 APP_DIR="/home/ubuntu/your-app-directory"
 
 echo "Checking active port..."
-ACTIVE_PORT=$(ssh $EC2_USER@$EC2_HOST "grep -oP 'server 127.0.0.1:\K[0-9]+' $NGINX_CONF")
+ACTIVE_PORT=$(grep -oP 'server 127.0.0.1:\K[0-9]+' $NGINX_CONF)
 
 if [ "$ACTIVE_PORT" == "8081" ]; then
   NEW_PORT=8082
@@ -27,9 +27,6 @@ echo "Active: $ACTIVE_PORT | Deploying to $NEW_COLOR:$NEW_PORT"
 
 ssh $EC2_USER@$EC2_HOST << EOF
   set -e
-
-  echo "Navigating to $APP_DIR"
-  cd $APP_DIR
 
   echo "Pulling Docker image: $DOCKER_IMAGE"
   docker pull $DOCKER_IMAGE
