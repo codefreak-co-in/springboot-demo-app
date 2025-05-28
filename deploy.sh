@@ -11,7 +11,7 @@ HEALTH_CHECK_PATH="/actuator/health"
 APP_DIR="/home/ubuntu/your-app-directory"
 
 echo "Checking active port..."
-ACTIVE_PORT=$(grep -oP 'proxy_pass 127.0.0.1:\K[0-9]+' $NGINX_CONF)
+ACTIVE_PORT=$(grep -oP 'proxy_pass 127.0.0.1:\K[0-9]+' $NGINX_CONF || true)
 
 if [ "$ACTIVE_PORT" == "8081" ]; then
   NEW_PORT=8082
