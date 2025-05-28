@@ -4,7 +4,7 @@ set -e
 
 # CONFIGURATION
 EC2_USER="ubuntu"
-EC2_HOST="your-ec2-ip"
+EC2_HOST="3.110.121.131"
 DOCKER_IMAGE="${1}"  # Pass image name as first argument
 NGINX_CONF="/etc/nginx/conf.d/app.conf"
 HEALTH_CHECK_PATH="/actuator/health"
