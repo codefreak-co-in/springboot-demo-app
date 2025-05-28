@@ -107,7 +107,7 @@ jobs:
           scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deploy.sh ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/deploy.sh
       - name: Run deployment script on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} \
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -T ubuntu@${{ secrets.EC2_HOST }} \
           "chmod +x /home/ubuntu/deploy.sh && /home/ubuntu/deploy.sh ${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.sha }}"
 
   
