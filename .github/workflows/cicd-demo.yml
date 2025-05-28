@@ -42,6 +42,7 @@ jobs:
 
   docker-deploy:
       runs-on: ubuntu
+      needs: [compile, running-tests]
       steps:
         - uses: actions/checkout@v3
 
