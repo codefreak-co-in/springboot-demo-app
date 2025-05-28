@@ -11,7 +11,7 @@ HEALTH_CHECK_PATH="/actuator/health"
 APP_DIR="/home/ubuntu/your-app-directory"
 
 echo "Checking active port..."
-ACTIVE_PORT=$(grep -oP 'server 127.0.0.1:\K[0-9]+' $NGINX_CONF)
+ACTIVE_PORT=$(grep -oP 'proxy_pass 127.0.0.1:\K[0-9]+' $NGINX_CONF)
 
 if [ "$ACTIVE_PORT" == "8081" ]; then
   NEW_PORT=8082
@@ -56,7 +56,7 @@ ssh $EC2_USER@$EC2_HOST << EOF
   fi
 
   echo "Switching NGINX to port $NEW_PORT"
-  sudo sed -i "s/server 127.0.0.1:[0-9]\+/server 127.0.0.1:$NEW_PORT/" $NGINX_CONF
+  sudo sed -i "s/proxy_pass 127.0.0.1:[0-9]\+/proxy_pass 127.0.0.1:$NEW_PORT/" $NGINX_CONF
   sudo nginx -s reload
 
   echo "Stopping and removing old container: $OLD_COLOR"
