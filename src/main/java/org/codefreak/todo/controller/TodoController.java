@@ -18,7 +18,7 @@ public class TodoController {
 
     @GetMapping
     public ResponseEntity<?> getTodo() {
-        logger.info("getTodo log");
+        logger.info("getTodo api");
         List<String> todos = List.of("Todo 1", "Todo2");
         logger.info(todos.toString());
         return ResponseEntity.ok(todos);
@@ -26,7 +26,7 @@ public class TodoController {
 
     @GetMapping(value = "/health")
     public ResponseEntity<?> health() {
-        logger.info("health log");
+        logger.info("health api");
         return new ResponseEntity<>("health", HttpStatus.OK);
     }
 
