@@ -100,14 +100,15 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -t rsa ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
       - name: Copy deployment script to EC2
         run: |
           scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deploy.sh ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/deploy.sh
       - name: Run deployment script on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -T ubuntu@${{ secrets.EC2_HOST }} \
+          ssh -tt -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} \
           "chmod +x /home/ubuntu/deploy.sh && /home/ubuntu/deploy.sh ${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.sha }}"
 
   
