@@ -130,3 +130,25 @@ Each log stream belongs to one log group
 
 * docker volume ls - Displays all the available volume
 * docker volume inspect volume_name - Displays mount point
+
+# Commands for installing nginx
+
+- sudo apt-get update
+- sudo apt-get install nginx -y
+- sudo systemctl start nginx
+- sudo systemctl enable nginx
+- sudo systemctl status nginx
+
+```bash
+server {
+  listen 80;
+
+  location / {
+    proxy_pass http://127.0.0.1:8081;  # This will be updated dynamically by your deployment script
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+  }
+}
+```
+
+* sudo systemctl reload nginx

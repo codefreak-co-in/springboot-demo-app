@@ -92,15 +92,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker-deploy
     steps:
-        - name: Deploy to EC2
-          uses: appleboy/ssh-action@master
-          with:
-            host: ${{ secrets.EC2_HOST }}
-            username: ubuntu
-            key: ${{ secrets.EC2_SSH_KEY }}
-            script: |
-              cd /home/ubuntu/your-app-directory
-              ./deploy.sh ${{ github.sha }}
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Upload deploy.sh to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: deploy.sh
+          target: /home/ubuntu/todo/
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            chmod +x /home/ubuntu/todo/deploy.sh
+            /home/ubuntu/todo/deploy.sh ${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.sha }}
 
 
 
