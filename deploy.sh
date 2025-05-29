@@ -3,14 +3,11 @@
 set -e
 
 # CONFIGURATION
-EC2_USER="ubuntu"
-EC2_HOST="65.1.147.3"
-DOCKER_IMAGE="${1}"  # Pass image name as first argument
+DOCKER_IMAGE="${1}"  # Image name passed as the first argument
 NGINX_CONF="/etc/nginx/conf.d/app.conf"
 HEALTH_CHECK_PATH="/actuator/health"
-APP_DIR="/home/ubuntu/your-app-directory"
 
-echo "Checking active port..."
+echo "Checking active port in NGINX config..."
 ACTIVE_PORT=$(grep -oP 'proxy_pass http://127.0.0.1:\K[0-9]+' $NGINX_CONF)
 
 if [ "$ACTIVE_PORT" == "8081" ]; then
@@ -25,41 +22,40 @@ fi
 
 echo "Active: $ACTIVE_PORT | Deploying to $NEW_COLOR:$NEW_PORT"
 
-ssh $EC2_USER@$EC2_HOST << EOF
-  set -e
+echo "Pulling Docker image: $DOCKER_IMAGE"
+docker pull $DOCKER_IMAGE
 
-  echo "Pulling Docker image: $DOCKER_IMAGE"
-  docker pull $DOCKER_IMAGE
+echo "Stopping any existing $NEW_COLOR container"
+docker stop app_$NEW_COLOR || true
+docker rm app_$NEW_COLOR || true
 
-  echo "Stopping any existing $NEW_COLOR container"
-  docker stop app_$NEW_COLOR || true
-  docker rm app_$NEW_COLOR || true
+echo "Starting new container on port $NEW_PORT"
+docker run -d --name app_$NEW_COLOR -p $NEW_PORT:8080 $DOCKER_IMAGE
 
-  echo "Starting new container on port $NEW_PORT"
-  docker run -d --name app_$NEW_COLOR -p $NEW_PORT:8080 $DOCKER_IMAGE
-
-  echo "Waiting for health check..."
-  SUCCESS=false
-  for i in {1..10}; do
-    STATUS=\$(curl -s http://localhost:$NEW_PORT$HEALTH_CHECK_PATH | grep '"status":"UP"')
-    if [ ! -z "\$STATUS" ]; then
-      echo "Service is healthy!"
-      break
-    fi
-    echo "Attempt \$i..."
-    sleep 5
-  done
-
-  if [ "$SUCCESS" = false ]; then
-    echo "Health check failed after 10 attempts. Aborting deployment!"
-    exit 1
+echo "Waiting for health check on port $NEW_PORT..."
+SUCCESS=false
+for i in {1..10}; do
+  STATUS=$(curl -s http://localhost:$NEW_PORT$HEALTH_CHECK_PATH | grep '"status":"UP"')
+  if [ ! -z "$STATUS" ]; then
+    echo "Service is healthy!"
+    SUCCESS=true
+    break
   fi
+  echo "Attempt $i..."
+  sleep 5
+done
 
-  echo "Switching NGINX to port $NEW_PORT"
-  sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass 127.0.0.1:$NEW_PORT/" $NGINX_CONF
-  sudo nginx -s reload
+if [ "$SUCCESS" = false ]; then
+  echo "Health check failed after 10 attempts. Aborting deployment!"
+  exit 1
+fi
 
-  echo "Stopping and removing old container: $OLD_COLOR"
-  docker stop app_$OLD_COLOR || true
-  docker rm app_$OLD_COLOR || true
-EOF
+echo "Switching NGINX to port $NEW_PORT"
+sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass 127.0.0.1:$NEW_PORT/" $NGINX_CONF
+sudo nginx -s reload
+
+echo "Stopping and removing old container: $OLD_COLOR"
+docker stop app_$OLD_COLOR || true
+docker rm app_$OLD_COLOR || true
+
+echo "✅ Deployment to $NEW_COLOR complete!"
