@@ -23,14 +23,14 @@ fi
 echo "Active: $ACTIVE_PORT | Deploying to $NEW_COLOR:$NEW_PORT"
 
 echo "Pulling Docker image: $DOCKER_IMAGE"
-docker pull $DOCKER_IMAGE
+sudo docker pull $DOCKER_IMAGE
 
 echo "Stopping any existing $NEW_COLOR container"
-docker stop app_$NEW_COLOR || true
-docker rm app_$NEW_COLOR || true
+sudo docker stop app_$NEW_COLOR || true
+sudo docker rm app_$NEW_COLOR || true
 
 echo "Starting new container on port $NEW_PORT"
-docker run -d --name app_$NEW_COLOR -p $NEW_PORT:8080 $DOCKER_IMAGE
+sudo docker run -d --name app_$NEW_COLOR -p $NEW_PORT:8080 $DOCKER_IMAGE
 
 echo "Waiting for health check on port $NEW_PORT..."
 SUCCESS=false
@@ -55,7 +55,7 @@ sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass 127.0.0.1:$NEW_P
 sudo nginx -s reload
 
 echo "Stopping and removing old container: $OLD_COLOR"
-docker stop app_$OLD_COLOR || true
-docker rm app_$OLD_COLOR || true
+sudo docker stop app_$OLD_COLOR || true
+sudo docker rm app_$OLD_COLOR || true
 
-echo "✅ Deployment to $NEW_COLOR complete!"
+echo "Deployment to $NEW_COLOR complete!"
