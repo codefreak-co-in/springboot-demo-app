@@ -3,6 +3,7 @@
 set -e
 
 # CONFIGURATION
+EC2_PUBLIC_IP="13.233.163.151"
 DOCKER_IMAGE="${1}"  # Image name passed as the first argument
 NGINX_CONF="/etc/nginx/conf.d/app.conf"
 HEALTH_CHECK_PATH="/actuator/health"
@@ -35,7 +36,7 @@ sudo docker run -d --name app_$NEW_COLOR -p $NEW_PORT:8080 $DOCKER_IMAGE
 echo "Waiting for health check on port $NEW_PORT..."
 SUCCESS=false
 for i in {1..10}; do
-  STATUS=$(curl -s http://localhost:$NEW_PORT$HEALTH_CHECK_PATH | grep '"status":"UP"')
+  STATUS=$(curl -s http://$EC2_PUBLIC_IP:$NEW_PORT$HEALTH_CHECK_PATH | grep '"status":"UP"')
   if [ ! -z "$STATUS" ]; then
     echo "Service is healthy!"
     SUCCESS=true
