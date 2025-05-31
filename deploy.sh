@@ -52,7 +52,7 @@ if [ "$SUCCESS" = false ]; then
 fi
 
 echo "Switching NGINX to port $NEW_PORT"
-sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass 127.0.0.1:$NEW_PORT/" $NGINX_CONF
+sudo sed -i "s/proxy_pass http:\/\/127.0.0.1:[0-9]\+/proxy_pass http:\/\/127.0.0.1:$NEW_PORT/" $NGINX_CONF
 sudo nginx -s reload
 
 echo "Stopping and removing old container: $OLD_COLOR"
