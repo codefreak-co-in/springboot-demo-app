@@ -20,7 +20,7 @@ public class TodoController {
     @GetMapping
     public ResponseEntity<?> getTodo() {
         logger.info("getTodo api");
-        List<String> todos = List.of("Todo 1", "Todo2");
+        List<String> todos = List.of("Todo 1", "Todo2", "Todo 3");
         logger.info(todos.toString());
         return ResponseEntity.ok(todos);
     }
