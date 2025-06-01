@@ -3,7 +3,7 @@
 set -e
 
 # CONFIGURATION
-EC2_PUBLIC_IP="13.233.163.151"
+EC2_PUBLIC_IP="13.203.205.220"
 DOCKER_IMAGE="${1}"  # Image name passed as the first argument
 NGINX_CONF="/etc/nginx/conf.d/app.conf"
 HEALTH_CHECK_PATH="/actuator/health"
